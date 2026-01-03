@@ -1,4 +1,5 @@
 ﻿using FlightStatusManagement.Application.Common.Interfaces;
+using FlightStatusManagement.Infrastructure.Auth;
 using FlightStatusManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,6 +17,11 @@ namespace FlightStatusManagement.Infrastructure
             });
 
             services.AddScoped<IApplicationDbContext,ApplicationDbContext>();
+
+            services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
+
+            services.AddScoped<IPasswordHasher, PasswordHasherService>();
+            services.AddScoped<ITokenService, TokenService>();
 
             return services;
         }

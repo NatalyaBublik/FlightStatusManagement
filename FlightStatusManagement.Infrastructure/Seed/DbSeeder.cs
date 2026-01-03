@@ -1,4 +1,5 @@
-﻿using FlightStatusManagement.Domain.Entities;
+﻿using FlightStatusManagement.Application.Common.Interfaces;
+using FlightStatusManagement.Domain.Entities;
 using FlightStatusManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,7 @@ namespace FlightStatusManagement.Infrastructure.Seed
 {
     public static class DbSeeder
     {
-        public static async Task SeedAsync(ApplicationDbContext context, ILogger logger, CancellationToken ct = default)
+        public static async Task SeedAsync(ApplicationDbContext context, IPasswordHasher hasher, ILogger logger, CancellationToken ct = default)
         {
             try
             {
@@ -44,8 +45,8 @@ namespace FlightStatusManagement.Infrastructure.Seed
                         .SingleAsync(ct);
 
                     context.Users.AddRange(
-                        new User { Username = "moderator_user", PasswordHash = "TEMP_HASH_MODERATOR", RoleId = moderatorRoleId },
-                        new User { Username = "user_user", PasswordHash = "TEMP_HASH_USER", RoleId = userRoleId }
+                        new User { Username = "moderator_user", PasswordHash = hasher.Hash("12345"), RoleId = moderatorRoleId },
+                        new User { Username = "user_user", PasswordHash = hasher.Hash("12345"), RoleId = userRoleId }
                     );
 
                     await context.SaveChangesAsync(ct);
@@ -58,6 +59,7 @@ namespace FlightStatusManagement.Infrastructure.Seed
             catch (Exception ex)
             {
                 logger.LogError(ex, "An error occurred while seeding the database.");
+
                 throw;
             }
         }
