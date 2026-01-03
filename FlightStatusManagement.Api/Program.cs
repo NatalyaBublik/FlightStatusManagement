@@ -1,3 +1,5 @@
+using FlightStatusManagement.Api.Middleware;
+using FlightStatusManagement.Api.Services;
 using FlightStatusManagement.Application;
 using FlightStatusManagement.Application.Common.Interfaces;
 using FlightStatusManagement.Infrastructure;
@@ -60,6 +62,11 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
@@ -106,6 +113,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
